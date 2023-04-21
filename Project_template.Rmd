@@ -1,0 +1,215 @@
+---
+title: "Project"
+output:
+  html_notebook:
+    fig_caption: yes
+    number_sections: yes
+    theme: readable
+    toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+---
+
+# Introduction: 
+  It is well known that the world we live in today is very different from the world we have lived in in the past, from the advances in technology to a population that’s highly educated. The fact that the current literacy rate of United States is around 80-90%, causes a saturated job market. This brings to major national conversations about formal education and it’s necessity in modern society, especially with the current student loan crisis. This brings us to another question on education accessibility and socio-economic status. If we take in to account the accessibility of education, it has no doubt gone up, however if we are considering whether education, especially formal education is important, its is important to take in to account whether socio-economics factors play in, and if higher education access affects quality of life, which is affected by income. In the olden days, it was thought that having access to higher education allowed for a better job and a good income, however in the recent times with inflation and stagnant income increase that has become a major question, especially for people who cannot afford it.So if income is based on educational access, we therefore hypothesize that those with parents who have children in top teir schools or competitive schools will have a higher income average than their peers, if education does not impact income much, then children with Ivy league or top school education will have similar income on average as their peers who did limited schooling or went to state schools. 
+
+# Data Preparation and Discription:
+## . Data description
+Since the question in this research is based on the income levels, and education, we sought to get our data from a credible soruce such as [opportunity insights](https://www.opportunityinsights.org/data/?geographic_level=0&topic=105&paper_id=0#resource-listing). The data we choose was Cross-Sectional Child Income Statistics by College Tier and Parent Income Percentile. In this data set there were given a range of parental income ranging from 0 to 99th percentile, and school tiers based on various levels of competitiveness from Ivy League to little to no college. The data also contained a list of children's average income, median income, their parent's income, the children income quantile, along with how many children of each parental income categories went to different schools.In order to give a better insight on what exactly the variables and the colleges are in  this data set deals with lets list them: 
+The variables that are measured here are these: 
+
+ **VARIABLES**   
+ 
+ * Tier - 
+ 
+     + 1 = Ivy Plus
+     + 2 = Other elite schools (public and private)
+     + 3 = Highly selective public
+     + 4 = Highly selective private
+     + 5 = Selective public
+     + 6 = Selective private
+     + 7 = Nonselective 4-year public
+     + 8 = Nonselective 4-year private not-for-profit
+     + 9 = Two-year (public and private not-for-profit)
+     + 10 = Four-year for-profit
+     + 11 = Two-year for-profit
+     + 12 = Less than two year schools of any type
+     + 13 = Attending college with insufficient data
+     + 14 = Not attending college at ages 19-22, among
+     + 14.1 = Attending college between ages 23-28
+     + 14.2 = Never attending college (before year 2013
+      
+* tier_name- the names of the tiers 
+* par_mean - Mean parent household income in par_pctile-tier cell
+* k_mean - Mean kid earnings
+* k_rank - Mean kid earnings rank
+* k_top[PCTILE]pc - Fraction of kids in the top percentile [PCTILE]
+* k_q[KIDQUINT] - Fraction of kids in an income quintile [KIDQUINT]. 1 is the bottom quintile and 5 is the top.
+* k_nowork - Fraction of kids not working
+* married - Fraction of kids married in 2014
+* k_median - Median child individual earnings in 2014.
+* k_median_nozero - Median child individual earnings in 2014 when excluding zeros, defined analogously to k_median. Set to missing when fewer than 50 kids in a cell have non-zero earnings.
+* count - Number of kids in par_pctile-tier cell
+* tot_count - Number of kids in the tier
+* density - Fraction of kids in each par_pctile by tier (parent income
+distribution, defined as count/tot_count)
+
+## . Data preparation: R environment    
+```{r message=FALSE}
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)     
+library(ggfortify)    
+library(GGally)     
+library(sjPlot)       
+library(modEvA) 
+```
+    
+## . Data loading and manipulation
+```{r}
+data<-read.csv("../data/dataset.csv")
+data
+```
+Here we imported the data frame using a csv file, which is a comma separated value file. 
+```{r}
+data$tier <- as.factor(data$tier)
+data$tier_name <- as.factor(data$tier_name)
+data$par_pctile<-as.factor(data$par_pctile)
+data
+```
+Here we converted the tier, the tier_name, and the par_pactile columns in the data set in to factors. This will help store them as a vector of integer values with a corresponding set of character values to use for them to be dusplayed later in the graphs. 
+
+```{r}
+saveRDS(data, file = "dataset.rds")
+```
+
+Here we saved the file as an RDS format. 
+```{r}
+data %>%
+  select(., tier_name, k_mean) %>%
+  arrange(., k_mean)
+```
+Selecting and limiting the data based on tier name and the average kid income
+
+```{r}
+df1 <- data %>%
+  group_by(tier)%>%
+  summarise(par_mean)
+df1
+```
+Selecting and limiting the data based on tier and the average Parental income
+
+```{r}
+data %>%
+  select(., par_pctile, tier_name, k_top1pc, k_mean, tot_count, density) %>%
+  arrange(., par_pctile, k_top1pc, density)
+```
+Selecting and limiting the data based on the average parental income, tier, kids in the top 1 percentage, the average kid income, the total ammount of kids in each tier, and  total ammount of kids in each parental income brackets, then arranging them based on the parental income average, the kid's in top 1 percent, and the ammount of kids in each parental income brackets. 
+
+
+# .  Data Visualization: 
+```{r}
+ggplot(data = data, mapping = aes(x = k_mean, fill=tier)) +
+  geom_vline(xintercept = 0, linetype = 2) +  
+  geom_histogram(bins = 50) +   
+  labs(x = "Kid Mean Incomer", y = "Count")
+```
+*Figure 1:* The chart depicts the range of average child income each tier typically sees. The x- axis represent the income average, and the y-axis represents the total count in that income bracket and the chart is distinguished by the tiers. This is a great way to visualize the outliers and their correlation, for example the children that went to top school generally had a higher income average. This chart, if converted in to a bell curve, would skew left. However to analyze the data those who weent to schools from tier 1 had the highest income average, howoever majority of the sample set fell between the income ranges of 30000 to 10000, and the most frequented group was in the the ranges of teir 7-9.  
+
+```{r}
+ggplot(data = data, mapping = aes(x = k_top5pc , color = tier_name)) +
+  geom_vline(xintercept = 0, linetype = 2) +
+  geom_density() + 
+  labs(x = "Fraction of kids in the top 5 percentile", y = "Density")
+```
+*Figure 2:* The image above is similar to figure 1. However the measure here is based on the fraction of kids in the top 5 percentile, and they are distinguished by the tiers and the probablity of kids getting higher in their income levels depending on their eductational tier, the y-value in this graph reperesents that probability function. As one can see through this chart, many kids that were in the top 5 percentile came from backgrounds with 2 year college or none, that's the green line, however the next two top frequencies were from selective private schools, and selective public schools. 
+
+
+# . Data Representation and Modeling: 
+```{r}
+ggplot(data = data, mapping = aes(x=k_mean, y = par_mean)) + 
+  geom_point() +
+  geom_smooth(method = loess, formula = y ~ x, se = TRUE) +   
+  xlab("Average Kid income") + ylab("Average Parental Income") +
+  theme_minimal(base_size = 16)
+
+```
+*Figure 3:* this is to compare the average kid income and see whether there is a correlation between the average parental income. The average parental income is on the y axis and the average kid income is on the x-axis. As one can notice this fit is not that great. It's barely there. The graph does not seem to fit with the points. 
+
+```{r}
+ggplot(data = data, mapping = aes(x=k_mean, y = par_mean)) + ylim(100000,400000)+ xlim(30000,150000)+
+  geom_point() +
+  geom_smooth(method = loess, formula = y ~ x, se = TRUE) +   
+  xlab("Average Kid income") + ylab("Average Parental Income") +
+  theme_minimal(base_size = 16)
+
+```
+*Figure 4:* this is to compare the average kid income and see whether there is a correlation between the average parental income. The average parental income is on the y axis and the average kid income is on the x-axis. We also zoomed in, because the original data contained too many clustered points that really did not do justice to the As one can notice this fit is not that great. It's barely there. The graph does not seem to fit with the points. The relationship between parental income and mean kid income seems to be none. 
+
+```{r}
+ggplot(data = data, mapping = aes(x=k_mean, y = as.numeric(tier))) + 
+  geom_point() +
+  geom_smooth(method = loess, formula = y ~ x, se = TRUE) +   
+  xlab("Average Kid income") + ylab("College Tier") +
+  theme_minimal(base_size = 16)
+
+```
+*Figure 5:* this is to compare the average kid income and see whether there is a correlation between their college tier. The college tier is on the y axis and the average kid income is on the x-axis.  There seems to be a  relationship between college tier and mean kid income. Here we can see that the top level tiers like tier 1 to 4 had more kids making mover 100,000k than tiers after 5. 
+
+```{r}
+m1 <- lm(k_mean ~ tier, data = data)
+m1
+```
+*Figure 6:* The figure above checks for the linear relationship between tier and the average kid income outlook. The signs of a regression coefficient tells us if there is a positive or negative correlation between each independent variable and the dependent variable, a negative sign means the independent variable increases, the dependent variable tends to decrease. The tier with the positive sign was in tier one, all of the others were in in the lesses tiers, and it makes sense because as we go down the tiers the affects of education on income did not show significant changes. 
+
+```{r}
+autoplot(m1) +
+  theme_minimal()
+```
+*Figure 7:* the figure above we have 4 plots that deal with the data on  the linear relationship between tiers and the average kid income. The four graphs are residual vs fitted which is used to detect non-linearity unequal error variances, and out-liers. This is a great plot because the ideal residual plot is called the null residual plot which shows the random scatter of points near the identity line and the dotted line and solid line are extremely close.The second graph is the Q-Q plot which is a wonderful tool in helping us understand and check for standard deviations and the distributions of our residuals. In this graph there seems to be a spike of identical values, with a slight skew. The bottom two, one called scale location displays the fitted values of a regression model along the x-axis and the the square root of the standardized residuals along the y-axisn and the second one, is a tool to explore how a batch of numbers deviates from a theoretical distribution and to visually assess whether the difference is significant for the purpose of the analysis. In the scale location model the line is pretty horrizontal, therefore the standardized resdiuals are not really changing much. 
+```{r}
+ggplot(data = data, mapping = aes(x = tier, y = log(k_mean))) + 
+  geom_point() +
+  geom_smooth(method = loess, formula = y ~ x, se = FALSE) +
+  xlab("tier") + ylab("log of average kid income") +
+  theme_minimal(base_size = 16)
+```
+
+*Figure 8:* This figure is to transform the data that deals with kid average income and tiers, so that a straight line would be possible. This model was to check if this was a better fitted version compared to the original, in terms of the autoplot. This is to transform skewed data to approximately conform to normality. As seen here and in comparison with figure 5, much has not changed. 
+
+
+```{r}
+m2 <- lm(log(k_mean) ~ tier, data = data)
+m2
+```
+*Figure 9:* The figure above depicts the mean value in each tier in which the student's average income and their dependency to increase or decrease compared to the treatment which was the tier. Compared to figure 6's intrepretations, nothing much has changed, except the numbers have been converted in to double digts  or tenths. 
+```{r}
+autoplot(m2) +
+  theme_minimal()
+
+```
+*Figure 10:* the figure above is the summary of data of the fitted, and better transformed m2. Here we have 4 plots that deal with the data on  the linear relationship between tiers and the average kid income. The four graphs are residual vs fitted which is used to detect non-linearity unequal error variances, and outliers. The second graph is the Q-Q plot which is a wonderful tool in helping us understand if the data ame from  theoretical distribution such as a Normal, exponential or Uniform distribution.The bottom two, one called scale location displays the fitted values of a regression model along the x-axis and the the square root of the standardized residuals along the y-axisn and the second one, is a tool to explore how a batch of numbers deviates from a theoretical distribution and to visually assess whether the difference is significant for the purpose of the analysis. We don't see a significant difference between this model compared to the figure 7. So the assumption about the models are the same, however certain values did increase. 
+```{r}
+summary(m2)
+```
+*Figure 11:* This is the summary of the data for m2, the standard errors, t-value, along with the first and second quantiles of the data. According to the data. Here the p-value of our data was 2.2e-16, which translates to 0.00000000000000022. For the data to be statiscally significant the p-value must be less than 0.05, which here it is. The coefficients also suggest a correlation between independent and dependent variables, where negatives increase after tier one. And the t-value is significant in tier one, it's greater than 1.96, but its not significant past that. 
+```{r}
+confint(m2)
+```
+*Figure 12:* This is the confidence level interval.the Confint methods call the appropriate profile method, then find the confidence intervals by interpolation in the profile traces. It tells you that if we run the experiment multiple times the confidence of similar results coming out in our case would be 97.5%. 
+
+```{r}
+plot_model(m2, type = "pred", terms = "tier") +
+  geom_point(data = data, mapping = aes(x =as.numeric(tier), y = k_mean))  + ylim(10000,100000) +  geom_smooth(method = lm)
+```
+*Figure 12:* The model above depicts the predicted values of average kid income based on the tier. As seen the in te previous models, the higher tiers had higher chance of income over 75,000. 
+
+# Results and Disscussion: 
+  The results of the data in terms of figuring out whether average kid income was affected by education showed that the students in higher tiers, like those that went to Ivy league schools, or other elite schools, did have a higher income. The graph, such as in figure 12, shows there is a correlation between tier and income for the kids. However the curve is not greatly fitted, as there are outliers and there are extreme clusters of kid income groups, however just visualizing the data gives us a good understanding of the trends in it. We also tried to look at parental income and the relationship with kid income, we found that there wasn's some correlation, that the majority of kids whose parents were earning less than $200,000 were pretty much clustered around 40,000 dollars. The trend line was straight, so we are assuming that there wasn't much of a relationship between the parental income and kids income levels. The regression line in the zoomed in graph was straight and the the over all regression was curved upwards, however the fit for the model was not the best. In figure 7 we had four plots, that each said something unique about the data, but ties everything together. The leverage vs fitted graph for example in this figure was close to the dotted line. Since this graph shows the difference between the observed response and the fitted response values, its best to have two lines the dotted and the solid lines as close as they can be, which was seen in this graph. The p-value for our experiments was 0.00000000000000022, which suggest that there is a significance and the null hypothesis is not significant. Wel also need to acknowledge that while there is a signifant relationship between top tier schools and income levels, we don't yet know the significance on how much the parental incomes contribute to certain kids getting in those schools, along with the biases of the data that was collected. We also know that the densities and the total kid count for each tier was different which can contribute to figure one having slightly larger values for certain tiers than others. 
+  
+# .Conclusion
+  The goal of this project was to undertstand how education plays a role in income. We wanted to see if parents who have children in top teir schools or competative schools will have a higher income average than their peers in lower ranking schools; and if education does not impact income much, then children with Ivy league or top school education will have similar income on average as their peers who did limited schooling or went to state schools. Through our dataset results we did notice that kids who went to top schools did have a higer income rate than those who went to smaller schools. However we also aknowlegde that this data might not be in equal sizes for all tiers and some tiers might have more students than others which can influence certain things. We also tested to see if parental income and kid income were related, meaning if parents who earned high also had high earning kids, the results did not come out to be significant in terms of the linear regression models. We did try to see if certain parental incomes were found more in certain tiers however the models did not look correct and errors kept popping up so we abandoned that idea for a later project in time. It was a great expiriences collecting, analyzing and understanding the data using code, and the results were somewhat close to how we hypothesized. 
