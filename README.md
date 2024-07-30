@@ -42,17 +42,17 @@ The dataset was loaded from a CSV file and converted to factors where necessary 
 ## Data Visualization
 
 ### 3.1 Histogram of Average Kid Income by Tier
-![Figure 1](path/to/figure1.png)
+![Figure 1](images/figure1.png)
 The histogram shows the distribution of average child income across different educational tiers. Higher income averages are observed in top-tier schools, with a concentration of data between $30,000 and $100,000.
 
 ### 3.2 Density Plot of Top 5% Kids by Tier
-![Figure 2](path/to/figure2.png)
+![Figure 2](images/figure2.png)
 This density plot illustrates the fraction of kids in the top 5% percentile across various tiers. The highest densities are observed in selective and highly selective schools.
 
 ## Data Representation and Modeling
 
 ### 4.1 Scatter Plot of Average Kid Income vs. Parental Income
-![Figure 3](path/to/figure3.png)
+![Figure 3](images/figure3.png)
 This scatter plot examines the relationship between average parental income and average kid income. The data shows a weak correlation.
 
 ### 4.2 Zoomed-In Scatter Plot
