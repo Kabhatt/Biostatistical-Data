@@ -56,27 +56,27 @@ This density plot illustrates the fraction of kids in the top 5% percentile acro
 This scatter plot examines the relationship between average parental income and average kid income. The data shows a weak correlation.
 
 ### 4.2 Zoomed-In Scatter Plot
-![Figure 4](path/to/figure4.png)
+![Figure 4](images/figure4.png)
 Zooming in on the scatter plot highlights that the correlation between parental income and kid income remains weak.
 
 ### 4.3 Scatter Plot of Average Kid Income vs. College Tier
-![Figure 5](path/to/figure5.png)
+![Figure 5](images/figure5.png)
 The plot indicates a potential positive correlation between educational tier and average kid income. Higher tiers tend to show higher average incomes.
 
 ### 4.4 Linear Model of Average Kid Income by Tier
-![Figure 6](path/to/figure6.png)
+![Figure 6](images/figure6.png)
 A linear regression model reveals a general trend that higher educational tiers correlate with higher incomes, though the fit is not strong.
 
 ### 4.5 Residual and Diagnostic Plots
-![Figure 7](path/to/figure7.png)
+![Figure 7](images/figure7.png)
 Diagnostic plots for the linear model help assess the fit and residuals, revealing issues such as non-linearity and skewed distributions.
 
 ### 4.6 Log-Transformed Linear Model
-![Figure 8](path/to/figure8.png)
+![Figure 8](images/figure8.png)
 A log-transformed model was tested to better fit the data, but results were similar to the original model.
 
 ### 4.7 Summary of Log-Transformed Model
-![Figure 9](path/to/figure9.png)
+![Figure 9](images/figure9.png)
 This summary details the transformed model coefficients, showing minimal changes compared to the initial linear model.
 
 ## Results and Discussion
